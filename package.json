@@ -7,7 +7,7 @@
   "main": "./build/default/protobuf_for_node",
   "repository": {
     "type": "git",
-    "url": "git://github.com/chrisdew/protobuf.git"
+    "url": "git://github.com/wangbus/protobuf.git"
   },
   "scripts": { 
     "install": "PROTOBUF=/usr/local/lib node-waf configure clean build" 
