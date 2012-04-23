@@ -1,39 +1,43 @@
-This is a fork of http://code.google.com/p/protobuf-for-node/
+This is a fork of [protobuf-for-node](http://code.google.com/p/protobuf-for-node/).
 
-My intention is just to package it up nicely for NPM and to fix some bugs.
+Changes
+-------
 
-I also intend to make it work with the NodeJS 0.6.x series.
+* Fixed to be compatible with node 0.6.
 
+but
 
+* Removed protoservice example.
+* Removed native interface.
 
-Prerequisites:
---------------
-
-NodeJS v0.4.X
-npm
-
-
-To install on Ubuntu:
----------------------
-
-1. wget http://protobuf.googlecode.com/files/protobuf-2.4.1.tar.gz
-2. tar -xzvf protobuf-2.4.1.tar.gz
-3. cd protobuf-2.4.1/
-4. ./configure && make && sudo make install
-5. cd
-6. npm install protobuf
-7. echo "/home/chris/node_modules/protobuf/build/default/" | sudo tee /etc/ld.so.conf.d/protobuf.conf
-   (replace /home/chris/node_modules with wherever you installed the module)
-8. sudo ldconfig
-9. run node, try "require('protobuf');" - you should see: { Schema: [Function: Schema] }
+Otherwise it wouldn't compile.
 
 
-As seen from the instructions above, this is my first attempt at packaging a slightly complex C++ module for NPM.
+Prerequisites
+-------------
 
-If you can help me simplify these instructions, please submit a patch.
+* [protobuf](http://code.google.com/p/protobuf/)
 
 
-Good luck,
+Usage
+-----
 
-Chris.
+1. Write proto file(s)
+2. Generate desc file from proto file(s) with `protoc --descriptor_set_out ...`
+3. Use desc files from your scripts like this:
 
+        var fs = require('fs'),
+            Schema = require('..').Schema;
+
+        var schema = new Schema(fs.readFileSync(__dirname + '/feeds.desc'));
+        var Feed = schema['feeds.Feed'];
+        var serialized = Feed.serialize({ title: 'Title', ignored: 42 });
+        console.log('Serialized:', serialized);
+
+        var aFeed = Feed.parse(serialized);
+        console.log('Parsed:', aFeed);
+
+4. Output:
+
+        Serialized: <SlowBuffer 0a 05 54 69 74 6c 65>
+        Parsed: { title: 'Title' }
