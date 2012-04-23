@@ -10,6 +10,6 @@
     "url": "git://github.com/wangbus/protobuf.git"
   },
   "scripts": { 
-    "install": "PROTOBUF=/usr/local/lib node-waf configure clean build" 
+    "install": "node-waf configure clean build" 
   }
 }
