@@ -1,11 +1,11 @@
 This is a fork of http://code.google.com/p/protobuf-for-node/
 
-It now works with the NodeJS 0.6.x series.
+It now works with the NodeJS 0.8.x series.
 
 Prerequisites:
 --------------
 
-NodeJS v0.6.X
+NodeJS v0.8.X
 npm
 
 

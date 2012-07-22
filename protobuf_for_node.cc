@@ -546,7 +546,7 @@ namespace protobuf_for_node {
     class AsyncInvocation {
     public:
       static void Init() {
-        ev_async_init(&ev_done, &InvokeAsyncCallbacks);
+        uv_async_init(uv_default_loop(), &uv_done, InvokeAsyncCallbacks);
       }
 
       // main thread:
@@ -560,7 +560,7 @@ namespace protobuf_for_node {
                    EIO_PRI_DEFAULT,
                    &AsyncInvocation::Returned,
                    static_cast<void*>(new AsyncInvocation(service, method, request, response, response_type, cb)));
-        ev_ref(EV_DEFAULT_UC);
+        uv_ref((uv_handle_t *)&uv_done);
       }
 
     private:
@@ -587,7 +587,7 @@ namespace protobuf_for_node {
       }
 
       static AsyncInvocation* head;
-      static ev_async ev_done;
+      static uv_async_t uv_done;
 
       // in some thread:
       static void Run(eio_req* req) {
@@ -602,7 +602,7 @@ namespace protobuf_for_node {
       // in some thread:
       static void Done(AsyncInvocation* self) {
         self->done_ = true;
-        ev_async_send(EV_DEFAULT_UC_ &ev_done);
+        uv_async_send(&uv_done);
       }
 
       // main thread: service method returned
@@ -611,9 +611,6 @@ namespace protobuf_for_node {
         if (self->done_) {
           InvokeCallback(self);
         } else {
-          // first delayed response?
-          if (!head) ev_async_start(EV_DEFAULT_UC_ &AsyncInvocation::ev_done);
-
           // enqueue
           self->next_ = head;
           head = self;
@@ -623,7 +620,7 @@ namespace protobuf_for_node {
       }
 
       // main thread: service called Done() delayed
-      static void InvokeAsyncCallbacks(EV_P_ ev_async *, int) {
+      static void InvokeAsyncCallbacks(uv_async_t*, int) {
         AsyncInvocation** pself = &head;
         AsyncInvocation* self;
         while ((self = *pself)) {
@@ -636,7 +633,7 @@ namespace protobuf_for_node {
         }
 
         // all outstanding callbacks delivered
-        if (!head) ev_async_stop(EV_DEFAULT_UC_ &ev_done);
+        if (!head) uv_close((uv_handle_t*)&uv_done, NULL);
       }
 
       static void InvokeCallback(AsyncInvocation* self) {
@@ -644,7 +641,7 @@ namespace protobuf_for_node {
         Handle<Value> result = self->response_type_->ToJs(*(self->response_));
         self->cb_->Call(Context::GetCurrent()->Global(), 1, &result);
         delete self;
-        ev_unref(EV_DEFAULT_UC);
+        uv_unref((uv_handle_t *)&uv_done);
       }
 
     private:
@@ -659,7 +656,7 @@ namespace protobuf_for_node {
     };
   };
   WrappedService::AsyncInvocation* WrappedService::AsyncInvocation::head = NULL;
-  ev_async WrappedService::AsyncInvocation::ev_done;
+  uv_async_t WrappedService::AsyncInvocation::uv_done;
 
   static void Init() {
     if (!TypeTemplate.IsEmpty()) return;
