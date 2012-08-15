@@ -1,52 +1,42 @@
-This is a fork of http://code.google.com/p/protobuf-for-node/
+This is a fork of [protobuf-for-node](http://code.google.com/p/protobuf-for-node/).
 
-It now works with the NodeJS 0.8.x series.
+Changes
+-------
 
-Prerequisites:
---------------
+* Fixed to be compatible with node 0.8.
+* Fixed to be compatible with node 0.6.
 
-NodeJS v0.8.X
-npm
+but
 
+* Removed protoservice example.
+* Removed native interface.
 
-To install on Ubuntu and OSX:
--------------------------------
+Otherwise it wouldn't compile.
 
-The first steps are to build and install Google's protobuf library. Make sure you have the right version by running "protoc --version" after the install.
+Prerequisites
+-------------
 
-    wget http://protobuf.googlecode.com/files/protobuf-2.4.1.tar.gz
-    tar -xzvf protobuf-2.4.1.tar.gz
-    cd protobuf-2.4.1/
-    ./configure && make && sudo make install
-    cd
+* [protobuf](http://code.google.com/p/protobuf/)
 
-This installs the npm package.
+Usage
+-----
 
-    npm install protobuf
+1. Write proto file(s)
+2. Generate desc file from proto file(s) with `protoc --descriptor_set_out ...`
+3. Use desc files from your scripts like this:
 
-For Ubuntu, update library paths.
+        var fs = require('fs'),
+            Schema = require('..').Schema;
 
-    sudo ldconfig
+        var schema = new Schema(fs.readFileSync(__dirname + '/feeds.desc'));
+        var Feed = schema['feeds.Feed'];
+        var serialized = Feed.serialize({ title: 'Title', ignored: 42 });
+        console.log('Serialized:', serialized);
 
-For OSX, you might need to add the path:
+        var aFeed = Feed.parse(serialized);
+        console.log('Parsed:', aFeed);
 
-    export DYLD_LIBRARY_PATH=/home/chris/node_modules/protobuf/build/Release:/usr/local/lib:$DYLD_LIBRARY_PATH
+4. Output:
 
-And test that it works...  Run node, try 
-
-    require('protobuf');
-
-you should see: 
-
-    { Schema: [Function: Schema] }
-
-
-As seen from the instructions above, this is my first attempt at packaging a slightly complex C++ module for NPM.
-
-If you can help me simplify these instructions, please submit a patch.
-
-
-Good luck,
-
-Chris.
-
+        Serialized: <SlowBuffer 0a 05 54 69 74 6c 65>
+        Parsed: { title: 'Title' }

@@ -1,17 +1,26 @@
-{ "name" : "protobuf",
-  "version" : "0.3.1",
+{
+  "name" : "protobuf",
+  "version" : "0.4.1",
   "description" : "Protocol Buffers for NodeJS",
   "author": {
     "Matthias Ernst": "mernst@google.com"
   },
+  "contributors": [
+    {
+      "George Miroshnykov": "george.miroshnykov@gmail.com"
+    }
+  ],
   "main": "./build/Release/protobuf_for_node",
-  "engines": { "node": ">= 0.8.0" },
   "repository": {
     "type": "git",
-    "url": "git://github.com/chrisdew/protobuf.git"
+    "url": "git://github.com/loku/node-protobuf.git"
   },
   "scripts": { 
-    "install": "PROTOBUF=/usr/local/lib node-waf configure clean build",
-    "test": "node test/unittest.js"
+    "install": "node-waf configure clean build"
+  },
+  "main": "./build/Release/protobuf",
+  "engines": {
+    "node": "0.6 || 0.7 || 0.8",
+    "npm": "1"
   }
 }
